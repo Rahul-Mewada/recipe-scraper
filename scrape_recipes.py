@@ -3,8 +3,11 @@ import requests
 import extruct
 from w3lib.html import get_base_url
 
+
+'''
+Get raw HTML from a URL
+'''
 def get_html(url): 
-    """ Get raw HTML from a URL"""
     headers = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET',
@@ -15,21 +18,34 @@ def get_html(url):
     req = requests.get(url, headers = headers)
     return req.text
 
-
+'''
+Parse structured data from a target page
+'''
 def scrape(url):
-    """Parse structured data from a target page."""
     html = get_html(url)
     metadata = get_metadata(html, url)
     pprint(metadata, indent=2, width=150)
     return metadata
 
 
-
+'''
+Fetch JSON-LD structured data
+'''
 def get_metadata(html, url):
-    """Fetch JSON-LD structured data."""
     metadata = extruct.extract(
         html,
-        base_url=get_base_url(html, url),
+        #base_url=get_base_url(html, url),
         syntaxes=['json-ld'],
-    )['json-ld'][0]
-    return metadata
+    )['json-ld']
+    scraped_data = []
+    for data in metadata:
+        if bool(metadata) and isinstance(metadata, list):
+            scraped_data.append(data)
+    return scraped_data
+
+def main():
+    url = input("Enter recipe url: ")
+    scrape(url)
+
+if __name__ == '__main__':
+    main()
